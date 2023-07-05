@@ -1,5 +1,3 @@
-console.log("helooooo");
-
 // 1. 
 
 function getFirstWord(a: string) {
@@ -76,7 +74,7 @@ hey({ name: () => "vasya", type: "dog", coolness: 100 })
 // 5.
 
 // google for Record type
-function stringEntries(a) {
+function stringEntries(a:{} | [] ) {
     return Array.isArray(a) ? a : Object.keys(a)
 }
 
@@ -85,7 +83,7 @@ function stringEntries(a) {
 // you don't know Promises and async/await yet. Or do you? 
 // ....can be hard, don't worry and SKIP if you do not know how to do it
 
-async function world(a) {
+async function world(a: number) {
     return "*".repeat(a)
 }
 const hello = async () => {

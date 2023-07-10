@@ -27,54 +27,66 @@ getUserIP();
 // 3.1 async/await + Promise.all
 
 (async () => {
-  const urls = [
-    "https://random-data-api.com/api/name/random_name",
-    "https://random-data-api.com/api/name/random_name",
-    "https://random-data-api.com/api/name/random_name"
-  ];
 
-  const promises = urls.map((url) =>
-    fetch(url).then((response) => response.json()).then((response) => response.name)
-  );
+  try {
+    const urls = [
+      "https://random-data-api.com/api/name/random_name",
+      "https://random-data-api.com/api/name/random_name",
+      "https://random-data-api.com/api/name/random_name"
+    ];
 
-  const data = await Promise.all(promises);
+    const promises = urls.map((url) =>
+      fetch(url).then((response) => response.json()).then((response) => response.name)
+    );
 
-  console.log(data);
-  return data;
+    const data = await Promise.all(promises);
+
+    console.log(data);
+    return data;
+  } catch (error) {
+    console.error('Error:', error);
+  }
+
 })();
 
 // 3.2 async/await (without Promise.all)
 
 (async () => {
-  const urls = [
-    "https://random-data-api.com/api/name/random_name",
-    "https://random-data-api.com/api/name/random_name",
-    "https://random-data-api.com/api/name/random_name"
-  ];
 
-  const promises = urls.map((url) =>
-    fetch(url).then((response) => response.json()).then((response) => response.name)
-  );
+  try {
+    const urls = [
+      "https://random-data-api.com/api/name/random_name",
+      "https://random-data-api.com/api/name/random_name",
+      "https://random-data-api.com/api/name/random_name"
+    ];
 
-  const responses = [];
+    const promises = urls.map((url) =>
+      fetch(url).then((response) => response.json()).then((response) => response.name)
+    );
 
-  for (const requestPromise of promises) {
-    try {
-      const response = await requestPromise;
-      responses.push(response);
-    } catch (error) {
-      console.error('Error:', error);
-      throw error;
+    const responses = [];
+
+    for (const requestPromise of promises) {
+      try {
+        const response = await requestPromise;
+        responses.push(response);
+      } catch (error) {
+        console.error('Error:', error);
+        throw error;
+      }
     }
-  }
-  console.log(responses);
-  return responses;
+    
+    console.log(responses);
+    return responses;
 
+  } catch (error) {
+    console.error('Error:', error);
+  }
 })();
 
 // 3.3 only Promises
 
-(async () => {
+function makeParallelRequest () {
   const urls = [
     "https://random-data-api.com/api/name/random_name",
     "https://random-data-api.com/api/name/random_name",
@@ -87,9 +99,11 @@ getUserIP();
 
   const responses = [];
 
+  
+
   for (const requestPromise of promises) {
     try {
-      const response = await requestPromise;
+      const response = requestPromise;
       responses.push(response);
     } catch (error) {
       console.error('Error:', error);
@@ -99,6 +113,6 @@ getUserIP();
   console.log(responses);
   return responses;
 
-})();
+};
 
 

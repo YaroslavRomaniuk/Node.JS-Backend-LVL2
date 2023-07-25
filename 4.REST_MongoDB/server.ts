@@ -1,7 +1,23 @@
 import express from 'express';
+import fs from 'fs';
 
-const port = 8080;
+const bodyParser = require('body-parser');
+
+const port = 3005;
 const server = express();
+
+interface Item {
+  id:number;
+  text:string;
+  checked:boolean;
+}
+
+
+const items: { id: number; text: string; checked: boolean }[] = [];
+
+
+
+server.use(bodyParser.json())
 
 server.listen(port, () => {
   console.log("Listening on port:", port);
@@ -9,20 +25,41 @@ server.listen(port, () => {
   console.log("ERROR:", err);
 });
 
-server.get("/", (req, res) => {
-  res.send("<h1>HELLO!!!</h1>");
-  console.log(req.url);
+server.post("/api/v1/items", (req, res) =>{
 
+  let newID = parseInt(readLastId()) + 1;
+
+  saveNewId(newID);
+  
+  let newItem: Item = {
+    id:newID,
+    text: req.body,
+    checked: true
+  };
+
+  items.push(newItem);
+  res.json({ id: newItem.id });
+
+  console.log(newItem);
+});
+
+server.get("/api/v1/itemsTEST", (req, res) =>{
+  console.log(items);
 })
-.post("/", (req, res)=>{})
-.patch("/", (req, res)=>{})
-.put("/", (req, res)=>{})
-.delete("/", (req, res)=>{});
 
-server.get("/old",(req, res) => {
-  res.redirect("/new")
-});
+server.get("/api/v1/items", (req, res) =>{
+  res.json(items);
+})
 
-server.get("/new",(req, res) => {
-  res.send("<h2>NEEEE!!!</h2>");
-});
+
+function readLastId(): string {
+  try {
+    return fs.readFileSync('lastId.txt', 'utf-8');
+  } catch (error) {
+    return '';
+  }
+}
+
+function saveNewId(id: number): void {
+  fs.writeFileSync('lastId.txt', id.toString());
+}

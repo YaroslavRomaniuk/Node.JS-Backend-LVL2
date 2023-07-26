@@ -1,0 +1,12 @@
+curl -X POST -H "Content-Type: application/json" http://localhost:3005/api/v1/items -d '{"text":"hey"}'
+
+npx ts-node server.ts
+
+Invoke-RestMethod -Method POST -Uri "http://localhost:3005/api/v1/items" -Headers @{"Content-Type" = "application/json"} -Body '{"text":"hey"}'
+
+Invoke-RestMethod -Method POST -Uri "http://localhost:3005/api/v1/items" -Headers @{"Content-Type" = "application/json"} -Body '{"text":"hey123"}'
+
+
+Invoke-RestMethod -Method POST -Uri "http://localhost:3005/api/v1/items" -Headers @{"Content-Type" = "application/json"} -Body '{"text":"22232323"}'
+
+Invoke-RestMethod -Method GET -Uri "http://localhost:3005/api/v1/itemsTEST"

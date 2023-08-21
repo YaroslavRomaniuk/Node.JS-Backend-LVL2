@@ -447,7 +447,9 @@ README:
                 },
                 logout() {
                     const route = this.apiVersion === 'v1' ? '/logout' : '/router';
+                    alert(JSON.stringify(route))
                     const qs = {action: this.apiVersion === 'v1' ? '' : 'logout'};
+                    alert(JSON.stringify(qs))
                     fetch(this.apiURL + this.apiVersion + route, {
                         method: this.apiVersion === 'v1' ? 'POST' : 'POST',
                         credentials: 'include',

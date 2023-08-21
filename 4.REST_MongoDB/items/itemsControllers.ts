@@ -16,9 +16,14 @@ const bcrypt = require('bcryptjs');
 
 exports.getItems = async (req: RequestWithSession, res: Response) => {
     db = getDB();
-    let login = req.session.login;
+
+
+
+
+    let login = true;
+    //let login = req.session.login;
     //req.session.save()
-    console.log(login)
+    //console.log(login)
     if (login){
         db.collection('todos')
         .find()

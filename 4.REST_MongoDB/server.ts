@@ -31,16 +31,13 @@ const cors = require('cors');
 const port = 3005;
 const server = express();
 let testID = 0;
- 
+
 /** 
 server.use(session({
-    store: new FileStore({}),
-    secret: 'puuuupaaaa',
-    resave: true,
-    saveUninitialized: true,
-    cookie: {
-        maxAge: 2 * 60 * 60 * 1000, //2 hours
-    }
+  store: new FileStore({retries: 10}),
+  secret: 'keyboard cat',
+  resave: true,
+  saveUninitialized: true,
 }));
 */
 

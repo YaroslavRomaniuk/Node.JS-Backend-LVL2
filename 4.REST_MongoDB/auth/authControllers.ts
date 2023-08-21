@@ -53,7 +53,10 @@ exports.login = async (req: RequestWithSession, res: Response) => {
 
 
 exports.logout = async (req: RequestWithSession, res: Response) => {
-    req.session.destroy((err: Error | null) => {
+    res.send({ ok: true })
+
+    /** 
+        req.session.destroy((err: Error | null) => {
         if (err) {
           res.status(500).send({ "error": `${(err as Error).message}` });
         } else{
@@ -61,4 +64,9 @@ exports.logout = async (req: RequestWithSession, res: Response) => {
         }
         
       });
+    */
+} 
+
+exports.getSession = async (req: RequestWithSession, res: Response) => {
+   console.log(JSON.stringify(req.session))
 } 

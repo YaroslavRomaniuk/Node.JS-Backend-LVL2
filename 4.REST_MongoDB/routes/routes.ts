@@ -5,7 +5,8 @@ const controllerItems = require('./../items/itemsControllers');
 
 router.post('/register', controllerAuth.register);
 router.post('/login', controllerAuth.login);
-router.get('/logout', controllerAuth.login);
+router.post('/logout', controllerAuth.logout);
+router.get('/session', controllerAuth.getSession);
 
 
 router.get('/items', controllerItems.getItems);

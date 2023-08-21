@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
 README:
-
+ 
 - serve it as static file from your web app
 - OR serve it as separate purely static site:
   1. place this file as `index.html` in new dir
@@ -11,7 +11,7 @@ README:
     - open http://localhost:8080 
     (if port 8080 is busy, find out other way to host the file, or ask in discord)
     - OR under mac/linux just use: python -m SimpleHTTPServer 8080
-
+ 
 -->
 <html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml">
 <head>
@@ -30,7 +30,7 @@ README:
             color: black;
             margin-left: 30px;
         }
-
+ 
         header {
             display: flex;
             justify-content: space-between;
@@ -38,14 +38,14 @@ README:
             background: white;
             align-items: center;
         }
-
+ 
         html,
         body {
             margin: 0;
             padding: 0;
             color: rgba(0,0,0,.87);
         }
-
+ 
         button {
             margin: 0;
             padding: 0;
@@ -61,7 +61,7 @@ README:
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
-
+ 
         body {
             font: 14px 'Helvetica Neue', Helvetica, Arial, sans-serif;
             background: #f8f8f8;
@@ -69,21 +69,21 @@ README:
             -moz-osx-font-smoothing: grayscale;
             font-weight: 300;
         }
-
+ 
         :focus {
             outline: 0;
         }
-
+ 
         .hidden {
             display: none;
         }
-
+ 
         .todoapp {
             min-width: 150px;
             max-width: 600px;
             margin: 133px auto 0;
         }
-
+ 
         input {
             position: relative;
             margin: 0;
@@ -99,11 +99,11 @@ README:
             border: 2px solid rgba(0,0,0,.08);
             padding: 5px 10px;
         }
-
+ 
         h3 {
             margin: 10px 0;
         }
-
+ 
         .new_todo_button{
             width: 100%;
             height: 100%;
@@ -112,7 +112,7 @@ README:
             text-align: center;
             color: white;
         }
-
+ 
         main{
             width: 772px;
             margin: 35px auto;
@@ -128,7 +128,7 @@ README:
             color: #27ae60;
             text-decoration: line-through;
         }
-
+ 
         button{
             cursor: pointer;
             padding-left: 3px;
@@ -137,7 +137,7 @@ README:
         .status h3{
             padding: 16px;
         }
-
+ 
         .contentText{
             display: flex;
             flex-direction: row;
@@ -147,7 +147,7 @@ README:
             flex-direction: row;
             padding-left: 85%;
         }
-
+ 
         .wrapper {
             background: #fff;
             position: relative;
@@ -160,7 +160,7 @@ README:
             display: flex;
             flex-direction: column;
         }
-
+ 
         .login button, .logout {
             margin: 5px 10px;
             padding: 5px 10px;
@@ -170,7 +170,7 @@ README:
             background-color: rgba(0,0,0,.05);
             transition: background .1s,color .1s;
         }
-
+ 
         .settings {
             margin: 20px 0;
         }
@@ -181,7 +181,7 @@ README:
         .settings input {
             width: 300px;
         }
-
+ 
         .settings button {
             background: white;
             margin: 2px;
@@ -214,7 +214,7 @@ README:
         .LoginInput input{
             margin-bottom: 16px;
         }
-
+ 
         hr {
             margin-top: 50px;
         }
@@ -265,16 +265,16 @@ README:
                 <span><button @click="addTask" class="button new_todo_button">Добавить</button></span>
             </label>
             <h3 class="status_title">{{'Активные задачи: ' + tasks.length}}</h3>
-            <task @task_del="deleteTask(task.id)"
+            <task @task_del="deleteTask(task[`_id`])"
                     @task_edit="editTask(index)"
-                    @task_done="markAsDone(index, task.id)"
-                    @save="save(index, task.id)"
+                    @task_done="markAsDone(index, task[`_id`])"
+                    @save="save(index, task[`_id`])"
                     @disable="disable(index)"
                     :data="task"
                     :index="index+1"
                     v-for="(task, index) in tasks"
                     :key="index"></task>
-
+ 
             <hr>
             <button @click="logout" class="logout">Выйти &#128682;</button>
         </div>
@@ -314,7 +314,7 @@ README:
     </div>
     `
         });
-
+ 
         let vue = new Vue({
             el: '#app',
             data: {
@@ -323,14 +323,13 @@ README:
                     editable: false,
                     checked: false
                 },
-                tasks: [
-                ],
+                tasks: [],
                 login: '',
-                pass: '',
+                pass: '', 
                 backendLanguage: 'JS',
                 apiURL: 'http://localhost:3005/api/',
                 apiVersion: 'v1',
-                step: ''
+                step: 'login'
             },
             computed: {
                 backendSuffix() {
@@ -348,6 +347,8 @@ README:
                         .then(res => res.json())
                         .then((response) => {
                             if (response.error === 'forbidden') {
+                                alert("it works")
+                                alert(JSON.stringify(response))
                                 this.step = 'login';
                             } else {
                                 this.tasks = response.items.map((item) => {
@@ -361,7 +362,7 @@ README:
                         })
                 },
                 deleteTask: function (index) {
-                    let request = JSON.stringify({ id: index, });
+                    let request = JSON.stringify({ id: index, });         
                     const route = this.apiVersion === 'v1' ? '/items' : '/router';
                     const qs = {action: this.apiVersion === 'v1' ? '' : 'deleteItem'};
                     fetch(this.apiURL + this.apiVersion + route + this.backendSuffix + '?' + new URLSearchParams(qs), {
@@ -392,7 +393,8 @@ README:
                             headers: {
                                 'Content-Type': 'application/json'
                             },
-                        }).then(res => res.json())
+                        }).then(res => res.json()     
+                        )
                             .then((response) => {
                                 if (response.id) {
                                     this.getTasks();
@@ -404,7 +406,9 @@ README:
                     }
                 },
                 updateTask: function (index, id) {
+                    alert("INDEX: " + index + "ID: " + id)
                     let request = JSON.stringify({ text: this.tasks[index].text, id: id, checked: this.tasks[index].checked });
+                    alert(request)
                     const route = this.apiVersion === 'v1' ? '/items' : '/router';
                     const qs = {action: this.apiVersion === 'v1' ? '' : 'editItem'};
                     fetch(this.apiURL + this.apiVersion + route + this.backendSuffix + '?' + new URLSearchParams(qs), {
@@ -434,7 +438,7 @@ README:
                         this.$set(this.tasks[index], 'text', this.tasks[index].inputedit);
                         this.updateTask(index, id);
                         this.$set(this.tasks[index], 'editable', false);
-
+ 
                     }
                 },
                 disable(index) {

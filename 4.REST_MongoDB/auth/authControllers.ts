@@ -3,6 +3,7 @@ const {connectToDb, getDB} = require('./../db');
 import { Db, Collection, ObjectId } from 'mongodb';
 import { User } from '../models/models';
 
+
 interface RequestWithSession extends Request {
     session: any;
   }
@@ -24,7 +25,7 @@ exports.register = async (req: Request, res: Response) => {
     
         const hashedPassword = await bcrypt.hash(req.body.pass, 10);
         
-        const user = new User(userName, hashedPassword);
+        const user = new User(userName, hashedPassword, []);
         
         await db.collection('users').insertOne(user);
 
@@ -38,11 +39,14 @@ exports.login = async (req: RequestWithSession, res: Response) => {
     try{
         db = getDB();
         const userName = req.body.login;
+        console.log("LOGIN BODY" + JSON.stringify(req.body))
         let checkUser = await db.collection('users').findOne({"login":userName})
         
         if (checkUser &&  await bcrypt.compare(req.body.pass, checkUser.pass)){
-            //req.session.login = userName;
-            res.status(200).json({ "ok" : true });
+            console.log("login successfull")
+            req.session.login = userName;
+            console.log("LOGIN SESSION: " + JSON.stringify(req.session))
+            res.status(200).send({ "ok" : true });
         } else {
             res.status(401).send({ error: "not found" })
         }
@@ -53,18 +57,16 @@ exports.login = async (req: RequestWithSession, res: Response) => {
 
 
 exports.logout = async (req: RequestWithSession, res: Response) => {
-    res.send({ ok: true })
-
-    /** 
+   
         req.session.destroy((err: Error | null) => {
         if (err) {
           res.status(500).send({ "error": `${(err as Error).message}` });
         } else{
         res.send({ ok: true })
         }
-        
+    
       });
-    */
+
 } 
 
 exports.getSession = async (req: RequestWithSession, res: Response) => {

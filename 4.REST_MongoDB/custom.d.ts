@@ -5,4 +5,5 @@ declare module "express-session" {
         // your custom properties here
         login: { [key: string]: any }; // example property
     }
+
 }

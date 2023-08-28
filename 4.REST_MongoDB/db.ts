@@ -9,7 +9,7 @@ module.exports = {
     MongoClient.connect(uri)
       .then((client: MongoClient) => {
         console.log('Connected to MongoDB');
-        dbConnection = client.db();
+        dbConnection = client.db('todos_app');
         return cb();
       })
       .catch((err: Error) => {

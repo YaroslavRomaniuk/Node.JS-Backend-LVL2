@@ -1,9 +1,9 @@
 import express from 'express';
 import session from 'express-session';
-const cors = require('cors');
+import cors from 'cors';
+
 const {connectToDb, getDB} = require('./db');
-import { Db, Collection, ObjectId } from 'mongodb';
-import SessionData from './custom.d'
+import { Db} from 'mongodb';
 const MongoDBStore = require('connect-mongodb-session')(session);
 
 let db: Db;
@@ -69,5 +69,7 @@ server.get('/get-session/:sessionId', (req, res) => {
 
 
 
-const router = require('./routes/routes')
-server.use('/api/v1/', router)
+const router_v1 = require('./routes/routes_v1')
+const router_v2 = require('./routes/routes_v2')
+server.use('/api/v1/', router_v1)
+server.use('/api/v2/', router_v2)

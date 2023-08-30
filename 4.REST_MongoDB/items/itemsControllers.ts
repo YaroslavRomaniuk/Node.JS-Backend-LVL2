@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
-
-const { getDB } = require('./../db');
+import { getDB } from '../mongodb/db';
 import { Db, ObjectId } from 'mongodb';
 import { Item } from '../models/models';
 
@@ -8,109 +7,111 @@ interface RequestWithSession extends Request {
     session: any;
 }
 
-
-
 let db: Db;
 
-const bcrypt = require('bcryptjs');
+export const getItems = async (req: RequestWithSession, res: Response) => {
+    try {
+        const login = req.session.login;
 
-exports.getItems_old = async (req: RequestWithSession, res: Response) => {
-    
+        if (!login) {
+            return res.status(403).send({ error: 'forbidden' });
+        }
 
- 
-    let login = req.session.login;
- 
-    if (login){
-        db = getDB();
-        db.collection('todos')
-        .find()
-        .toArray()
-        .then((todos) => {
+        const db = getDB();
+        const users = db.collection('users');
+        const user = await users.findOne({ login });
 
-            res.status(200).json({ items: todos });
-        })
-        .catch((error) => {
-            console.error(error);
-            res.status(500).send('Internal Server Error');
-        });
-    } else {
-        res.status(403).send({ error: 'forbidden' });
-    }
-    
-}
-
-exports.getItems = async (req: RequestWithSession, res: Response) => {
-    
-
-  
-    let login = req.session.login;
-
-    if (login){
-        db = getDB();
-        let users = db.collection('users');
-        let user = await users.findOne({ login: login })
-        if(user){
-            console.log(user.items)
+        if (user) {
             res.status(200).json({ items: user.items });
+        } else {
+            res.status(404).send({ error: 'User not found' });
         }
 
-    } else {
-        res.status(403).send({ error: 'forbidden' });
+    } catch (error) {
+        console.error('Internal Server Error:', error);
+        res.status(500).send('Internal Server Error');
     }
-    
-}
+};
 
-exports.addItem = async (req: RequestWithSession, res: Response) => {
-    db = getDB();
-    let itemID = new ObjectId;
-    const newItem: Item = {
-        _id: itemID,
-        text: req.body.text,
-        checked: false,
-    };
-    let login = req.session.login;
-    let users = db.collection('users');
-    const result = await users.updateOne(
-        { login: login },
-        { $push: { items: newItem } }
+export const addItem = async (req: RequestWithSession, res: Response) => {
+    try {
+        const db = getDB();
+        const itemID = new ObjectId();
+        const newItem: Item = {
+            _id: itemID,
+            text: req.body.text,
+            checked: false,
+        };
+        const login = req.session.login;
+        const users = db.collection('users');
+
+        const result = await users.updateOne(
+            { login },
+            { $push: { items: newItem } }
+        );
+
+        if (result.modifiedCount === 1) {
+            res.status(201).json({ id: itemID });
+        } else {
+            res.status(500).send('Failed to add item');
+        }
+    } catch (error) {
+        console.error('Internal Server Error:', error);
+        res.status(500).send('Internal Server Error');
+    }
+};
+
+export const changeItem = async (req: RequestWithSession, res: Response) => {
+    try {
+      const db = getDB();
+      const itemId = req.body.id;
+      const login = req.session.login;
+      const users = db.collection('users');
+  
+      const result = await users.updateOne(
+        { login, "items._id": new ObjectId(itemId) },
+        {
+          $set: {
+            "items.$.text": req.body.text,
+            "items.$.checked": req.body.checked
+          }
+        }
       );
-    res.status(201).json({ id: itemID });
-}
-
-
-
-
-exports.changeItem = async (req: RequestWithSession, res: Response) => {
-
-    db = getDB();
-    const itemId = req.body.id;
-    let login = req.session.login;
-    let users = db.collection('users');
-    users.updateOne(
-      { login: login, "items._id": new ObjectId(itemId) },
-      {
-        $set: {
-          "items.$.text": req.body.text,
-          "items.$.checked": req.body.checked
-        }
+  
+      if (result.modifiedCount === 1) {
+        res.status(200).json({ ok: true });
+      } else {
+        res.status(500).send('Failed to change item');
       }
-    );
-    res.status(200).json({ "ok": true });
-}
+    } catch (error) {
+      console.error('Internal Server Error:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  };
 
-exports.deleteItem = async (req: RequestWithSession, res: Response) => {
-
-    db = getDB();
-    const itemId = req.body.id;
-    let login = req.session.login;
-    let users = db.collection('users');
-    users.updateOne(
-      { login: login},
-      {
-        $pull: {
-          items: { _id: new ObjectId(itemId) }
+  export const deleteItem = async (req: RequestWithSession, res: Response) => {
+    try {
+      const db = getDB();
+      const itemId = req.body.id;
+      const login = req.session.login;
+      const users = db.collection('users');
+  
+      const result = await users.updateOne(
+        { login },
+        {
+          $pull: {
+            items: { _id: new ObjectId(itemId) }
+          }
         }
+      );
+  
+      if (result.modifiedCount === 1) {
+        res.status(200).json({ ok: true });
+      } else {
+        res.status(500).send('Failed to delete item');
       }
-    );
-    res.status(200).json({ "ok": true });
-}
+    } catch (error) {
+      console.error('Internal Server Error:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  };

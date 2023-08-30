@@ -1,17 +1,18 @@
-import express from 'express'
-const router = express.Router();
-const controllerAuth = require('./../auth/authControllers');
-const controllerItems = require('./../items/itemsControllers');
+import express, { Router } from 'express';
+import { register, login, logout, getSession } from './../auth/authControllers';
+import { getItems, addItem, changeItem, deleteItem } from './../items/itemsControllers';
 
-router.post('/register', controllerAuth.register);
-router.post('/login', controllerAuth.login);
-router.post('/logout', controllerAuth.logout);
-router.get('/session', controllerAuth.getSession);
+const router: Router = express.Router();
+
+router.post('/register', register)
+.post('/login', login)
+.post('/logout', logout)
+.get('/session', getSession);
 
 
-router.get('/items', controllerItems.getItems);
-router.post('/items', controllerItems.addItem);
-router.put('/items', controllerItems.changeItem);
-router.delete('/items', controllerItems.deleteItem);
+router.get('/items', getItems)
+.post('/items', addItem)
+.put('/items', changeItem)
+.delete('/items', deleteItem);
 
 module.exports = router

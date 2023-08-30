@@ -1,51 +1,43 @@
 import { Request, Response } from 'express';
-const {connectToDb, getDB} = require('./../db');
-import { Db, Collection, ObjectId } from 'mongodb';
+import { getDB } from '../mongodb/db';
 import { User } from '../models/models';
 
 
 interface RequestWithSession extends Request {
     session: any;
-  }
-
-
-
-let db: Db;
-const bcrypt = require('bcryptjs');
-
-exports.register = async (req: Request, res: Response) => {
-    try{
-        db = getDB();
-        const userName = req.body.login;
-        console.log(req.body)
-        let checkName = await db.collection('users').findOne({"login":userName})
-        if (checkName){
-            return res.status(400).json("Username already exists.")
-        }
-    
-        const hashedPassword = await bcrypt.hash(req.body.pass, 10);
-        
-        const user = new User(userName, hashedPassword, []);
-        
-        await db.collection('users').insertOne(user);
-
-        res.status(200).json({ "ok" : true });
-    } catch (e) {
-        return res.status(400).json("Registration error")
-    }
 }
 
-exports.login = async (req: RequestWithSession, res: Response) => {
+
+const bcrypt = require('bcryptjs');
+
+export const register = async (req: Request, res: Response) => {
+    try {
+      const db = getDB();
+      const userName = req.body.login;
+      const existingUser = await db.collection('users').findOne({ login: userName });
+      if (existingUser) {
+        return res.status(400).json("Username already exists.");
+      }
+  
+      const hashedPassword = await bcrypt.hash(req.body.pass, 10);
+      const user = new User(userName, hashedPassword, []);
+      await db.collection('users').insertOne(user);
+  
+      res.status(200).json({ ok: true });
+    } catch (error) {
+      console.error('Registration error:', error);
+      res.status(400).json("Registration error");
+    }
+  };
+
+export const login = async (req: RequestWithSession, res: Response) => {
     try{
-        db = getDB();
+        const db = getDB();
         const userName = req.body.login;
-        console.log("LOGIN BODY" + JSON.stringify(req.body))
         let checkUser = await db.collection('users').findOne({"login":userName})
         
         if (checkUser &&  await bcrypt.compare(req.body.pass, checkUser.pass)){
-            console.log("login successfull")
             req.session.login = userName;
-            console.log("LOGIN SESSION: " + JSON.stringify(req.session))
             res.status(200).send({ "ok" : true });
         } else {
             res.status(401).send({ error: "not found" })
@@ -56,7 +48,7 @@ exports.login = async (req: RequestWithSession, res: Response) => {
 } 
 
 
-exports.logout = async (req: RequestWithSession, res: Response) => {
+export const logout = async (req: RequestWithSession, res: Response) => {
    
         req.session.destroy((err: Error | null) => {
         if (err) {
@@ -69,6 +61,6 @@ exports.logout = async (req: RequestWithSession, res: Response) => {
 
 } 
 
-exports.getSession = async (req: RequestWithSession, res: Response) => {
+export const getSession = async (req: RequestWithSession, res: Response) => {
    console.log(JSON.stringify(req.session))
 } 

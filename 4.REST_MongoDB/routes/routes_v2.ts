@@ -1,53 +1,50 @@
-import express, { Request, Response } from 'express'
-const router = express.Router();
-const controllerAuth = require('./../auth/authControllers');
-const controllerItems = require('./../items/itemsControllers');
+import express, { Router, Request, Response  } from 'express';
+import { register, login, logout } from './../auth/authControllers';
+import { getItems, addItem, changeItem, deleteItem } from './../items/itemsControllers';
+
+const router: Router = express.Router();
 
 
-router.all('/router', async (req:Request,res:Response) =>{
-    switch (req.query.action){
-        case'register': {
-            await controllerAuth.register(req,res);
-            break;
+router.all('/router', async (req: Request, res: Response) => {
+    try {
+      switch (req.query.action) {
+        case 'register': {
+          await register(req, res);
+          break;
         }
-        case'login':{
-            await controllerAuth.login(req,res);
-            break;
+        case 'login': {
+          await login(req, res);
+          break;
         }
-        case'logout':{
-            await controllerAuth.logout(req,res);
-            break;
+        case 'logout': {
+          await logout(req, res);
+          break;
         }
-        case'getItems':{
-            await controllerItems.getItems(req,res);
-            break;
+        case 'getItems': {
+          await getItems(req, res);
+          break;
         }
-        case'createItem':{
-            await controllerItems.addItem(req,res);
-            break;
+        case 'createItem': {
+          await addItem(req, res);
+          break;
         }
-        case'editItem':{
-            await controllerItems.changeItem(req,res);
-            break;
+        case 'editItem': {
+          await changeItem(req, res);
+          break;
         }
-        case'deleteItem':{
-            await controllerItems.deleteItem(req,res);
-            break;
+        case 'deleteItem': {
+          await deleteItem(req, res);
+          break;
         }
+        default: {
+          res.status(400).send('Invalid action');
+          break;
+        }
+      }
+    } catch (error) {
+      console.error('Internal Server Error:', error);
+      res.status(500).send('Internal Server Error');
     }
-})
+  });
 
-
-/** 
-router.post('/register', controllerAuth.register);
-router.post('/login', controllerAuth.login);
-router.post('/logout', controllerAuth.logout);
-router.get('/session', controllerAuth.getSession);
-
-
-router.get('/items', controllerItems.getItems);
-router.post('/items', controllerItems.addItem);
-router.put('/items', controllerItems.changeItem);
-router.delete('/items', controllerItems.deleteItem);
-*/
 module.exports = router

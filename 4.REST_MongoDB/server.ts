@@ -2,7 +2,7 @@ import express from 'express';
 import session from 'express-session';
 import cors from 'cors';
 
-const {connectToDb, getDB} = require('./db');
+const {connectToDb, getDB} = require('./mongodb/db');
 import { Db} from 'mongodb';
 const MongoDBStore = require('connect-mongodb-session')(session);
 
@@ -28,6 +28,7 @@ server.use(session({
 }));
 
 server.use(express.json());
+
 /** 
 server.use(cors({
   origin: 'http://127.0.0.1:5500',
@@ -43,31 +44,11 @@ connectToDb((err?: Error) => {
       console.log("ERROR:", err);
     });
 
-    db = getDB(); // Assign value to the top-level db variable
+    db = getDB();
   } else {
     console.log(`DB connection error: ${err}`);
   }
 });
-
-
-
-server.get('/get-session/:sessionId', (req, res) => {
-  const { sessionId } = req.params;
-
-  sessionStore.get(sessionId, (err, session) => {
-      if(err) {
-          // handle error
-          console.log(err);
-          res.status(500).send('Error retrieving session');
-      } else {
-          console.log(req.session.login)
-          res.send(session);
-      }
-  });
-});
-
-
-
 
 const router_v1 = require('./routes/routes_v1')
 const router_v2 = require('./routes/routes_v2')

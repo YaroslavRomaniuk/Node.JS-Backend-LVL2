@@ -2,7 +2,7 @@
   "name": "4.rest_mongodb",
   "version": "1.0.0",
   "description": "REST+MongoDB_Basic_Server",
-  "main": "index.js",
+  "main": "server.ts",
   "scripts": {
     "dev": "nodemon server.ts"
   },
@@ -22,11 +22,13 @@
     "express": "^4.18.2",
     "express-session": "^1.17.3",
     "mongodb": "^5.7.0",
+    "mysql2": "^3.6.0",
     "session-file-store": "^1.5.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.6"
   },
   "devDependencies": {
+    "@types/node": "^20.5.9",
     "nodemon": "^3.0.1"
   }
 }

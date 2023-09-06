@@ -4,14 +4,15 @@ import session from 'express-session';
 import cors from 'cors';
 
 
-const { connectToDb, getDB } = require('./mongodb/db');
-import { connectMySQLdb, createDatabaseAndTables, createTables } from './mysql/mysql_db';
+const { connectToDb, getDB } = require('./mongodb/db/db');
+const { getDBMySQL } = require('./mysql/db/db');
+import { connectMySQLdb, createDatabaseAndTables, createTables } from './mysql/db/db';
 import { Db } from 'mongodb';
 import { Pool } from 'mysql2/typings/mysql/lib/Pool';
 import { Connection } from 'mysql2/promise';
 const MongoDBStore = require('connect-mongodb-session')(session);
 
-let mongoDB = true;
+let mongoDB = false;
 
 let db: Db;
 let mysql_db: Promise<Connection | undefined>;
@@ -57,15 +58,18 @@ if (mongoDB) {
     }
   });
 } else {
-  server.listen(port, () => {
-    console.log("Listening on port:", port);
-  }).on("error", (err: Error) => {
-    console.log("ERROR:", err);
-  });
+  connectMySQLdb((err?: Error) => {
+    if (!err) {
+      server.listen(port, () => {
+        console.log("Listening on port:", port);
+      }).on("error", (err: Error) => {
+        console.log("ERROR:", err);
+      });
 
-  mysql_db = connectMySQLdb().catch((error) => {
-    console.error('MySQL connection error:', error);
-    return undefined;
+      mysql_db = getDBMySQL();
+    } else {
+      console.log(`DB connection error: ${err}`);
+    }
   });
   //createDatabaseAndTables();
   //createTables();
@@ -110,8 +114,15 @@ server.get('/mysql/getusers', async (req, res) => {
   }
 });
 
+let router_v1;
+let router_v2;
+if (mongoDB) {
+  router_v1 = require('./mongodb/routes/routes_v1')
+  router_v2 = require('./mongodb/routes/routes_v2')
+} else {
+  router_v1 = require('./mysql/routes/routes_v1')
+  router_v2 = require('./mysql/routes/routes_v2')
+}
 
-const router_v1 = require('./routes/routes_v1')
-const router_v2 = require('./routes/routes_v2')
 server.use('/api/v1/', router_v1)
 server.use('/api/v2/', router_v2)

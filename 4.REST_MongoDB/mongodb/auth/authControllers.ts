@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { getDB } from '../mongodb/db';
-import { User } from '../models/models';
+import { getDB } from '../db/db';
+import { User } from '../../models/models';
 
 
 interface RequestWithSession extends Request {

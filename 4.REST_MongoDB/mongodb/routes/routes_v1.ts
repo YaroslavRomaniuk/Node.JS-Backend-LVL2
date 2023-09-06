@@ -1,6 +1,6 @@
 import express, { Router } from 'express';
-import { register, login, logout, getSession } from './../auth/authControllers';
-import { getItems, addItem, changeItem, deleteItem } from './../items/itemsControllers';
+import { register, login, logout, getSession } from '../auth/authControllers';
+import { getItems, addItem, changeItem, deleteItem } from '../items/itemsControllers';
 
 const router: Router = express.Router();
 

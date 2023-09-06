@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { getDB } from '../mongodb/db';
+import { getDB } from '../db/db';
 import { Db, ObjectId } from 'mongodb';
-import { Item } from '../models/models';
+import { Item } from '../../models/models';
 
 interface RequestWithSession extends Request {
     session: any;

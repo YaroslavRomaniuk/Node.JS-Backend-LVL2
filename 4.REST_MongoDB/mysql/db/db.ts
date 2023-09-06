@@ -1,20 +1,33 @@
 import mysql from 'mysql2/promise';
 
-export async function connectMySQLdb() {
-    const connection = await mysql.createConnection({
-        host: 'myfirstawsdb.coo1p4sufx7v.eu-north-1.rds.amazonaws.com',
-        user: 'YAR',
-        password: '12345678yar!!!',
-        database: 'todo_db'
+let dbConnection: mysql.Connection;
+
+export const connectMySQLdb = (cb: (error?: Error) => void) => {
+    mysql.createConnection({
+      host: 'myfirstawsdb.coo1p4sufx7v.eu-north-1.rds.amazonaws.com',
+      user: 'YAR',
+      password: '12345678yar!!!',
+      database: 'todo_db'
+    })
+    .then((connection: mysql.Connection) => {
+      console.log("!!! MySQL DB CONNECTED !!!")
+      dbConnection = connection;
+      return cb();
+    })
+    .catch((err: Error) => {
+      return cb(err);
     });
-
-    console.log("!!! MySQL DB CONNECTED !!!")
-
-    return connection;
-}
+  }
+  
+  export const getDBMySQL = (): mysql.Connection => {
+    if (!dbConnection) {
+      throw new Error('Database connection not established');
+    }
+    return dbConnection;
+  };
 
 export async function createDatabaseAndTables() {
-    const connection = await connectMySQLdb();
+    const connection = await getDBMySQL();
 
     const databaseName = 'todo_db';
 
@@ -32,7 +45,7 @@ export async function createDatabaseAndTables() {
 }
 
 export async function createTables() {
-    const connection = await connectMySQLdb();
+    const connection = await getDBMySQL();
 
     // Create 'users' table
     const usersTable = `

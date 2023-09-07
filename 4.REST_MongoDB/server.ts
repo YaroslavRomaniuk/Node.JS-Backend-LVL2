@@ -11,6 +11,7 @@ import { Db } from 'mongodb';
 import { Pool } from 'mysql2/typings/mysql/lib/Pool';
 import { Connection } from 'mysql2/promise';
 const MongoDBStore = require('connect-mongodb-session')(session);
+const MySQLStore = require('express-mysql-session')(session);
 
 let mongoDB = false;
 
@@ -58,6 +59,8 @@ if (mongoDB) {
     }
   });
 } else {
+  
+
   connectMySQLdb((err?: Error) => {
     if (!err) {
       server.listen(port, () => {
@@ -73,6 +76,26 @@ if (mongoDB) {
   });
   //createDatabaseAndTables();
   //createTables();
+
+  const sessionStore = new MySQLStore({
+    /* MySQL connection details */
+    host: 'your_db_host',
+    user: 'your_db_user',
+    password: 'your_db_password',
+    database: 'your_db_name',
+    clearExpired: true, // Automatically remove expired sessions
+    checkExpirationInterval: 900000, // How frequently to check for and remove expired sessions (15 minutes)
+  });
+
+  server.use(session({
+    secret: 'your_secret',
+    cookie: { maxAge: 1000 * 60 * 60 * 24 }, // 1 day
+    store: sessionStore,
+    resave: false,
+    saveUninitialized: false
+  }));
+
+
 }
 
 server.post('/mysql/users', async (req, res) => {
@@ -105,6 +128,24 @@ server.get('/mysql/getusers', async (req, res) => {
     }
 
     const [results] = await connection.query('SELECT * FROM users');
+    const users = results;
+
+    res.status(200).json(users);
+  } catch (error) {
+    console.error('Error retrieving users:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+server.get('/mysql/gettables', async (req, res) => {
+  try {
+    const connection = await mysql_db;
+
+    if (!connection) {
+      return res.status(500).json({ error: 'MySQL connection error' });
+    }
+
+    const [results] = await connection.query('SHOW TABLES;');
     const users = results;
 
     res.status(200).json(users);

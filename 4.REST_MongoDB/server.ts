@@ -6,9 +6,8 @@ import cors from 'cors';
 
 const { connectToDb, getDB } = require('./mongodb/db/db');
 const { getDBMySQL } = require('./mysql/db/db');
-import { connectMySQLdb, createDatabaseAndTables, createTables } from './mysql/db/db';
+import { connectMySQLdb } from './mysql/db/db';
 import { Db } from 'mongodb';
-import { Pool } from 'mysql2/typings/mysql/lib/Pool';
 import { Connection } from 'mysql2/promise';
 const MongoDBStore = require('connect-mongodb-session')(session);
 const MySQLStore = require('express-mysql-session')(session);
@@ -74,105 +73,28 @@ if (mongoDB) {
       console.log(`DB connection error: ${err}`);
     }
   });
-  //createDatabaseAndTables();
-  //createTables();
+
 
   const sessionStore = new MySQLStore({
-    /* MySQL connection details */
     host: 'myfirstawsdb.coo1p4sufx7v.eu-north-1.rds.amazonaws.com',
     user: 'YAR',
     password: '12345678yar!!!',
     database: 'todo_db',
-    clearExpired: true, // Automatically remove expired sessions
-    checkExpirationInterval: 900000, // How frequently to check for and remove expired sessions (15 minutes)
+    clearExpired: true,
+    checkExpirationInterval: 900000, 
   });
 
   server.use(session({
     secret: 'your_secret',
-    cookie: { maxAge: 1000 * 60 * 60 * 24 }, // 1 day
+    cookie: { maxAge: 1000 * 60 * 60 * 24 },
     store: sessionStore,
     resave: false,
     saveUninitialized: false
   }));
 
-
 }
 
-server.post('/mysql/users', async (req, res) => {
-  try {
-    const { login, pass } = req.body;
-    const connection = await mysql_db;
 
-    if (!connection) {
-      return res.status(500).json({ error: 'MySQL connection error' });
-    }
-
-    const [result] = await connection.query(
-      'INSERT INTO users (login, pass) VALUES (?, ?)',
-      [login, pass]
-    );
-    console.log('User created successfully')
-    res.status(201).json({ message: 'User created successfully' });
-  } catch (error) {
-    console.error('Error creating user:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-})
-
-server.get('/mysql/getusers', async (req, res) => {
-  try {
-    const connection = await mysql_db;
-
-    if (!connection) {
-      return res.status(500).json({ error: 'MySQL connection error' });
-    }
-
-    const [results] = await connection.query('SELECT * FROM users');
-    const users = results;
-
-    res.status(200).json(users);
-  } catch (error) {
-    console.error('Error retrieving users:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-
-server.get('/mysql/getitems', async (req, res) => {
-  try {
-    const connection = await mysql_db;
-
-    if (!connection) {
-      return res.status(500).json({ error: 'MySQL connection error' });
-    }
-
-    const [results] = await connection.query('SELECT * FROM items');
-    const users = results;
-
-    res.status(200).json(users);
-  } catch (error) {
-    console.error('Error retrieving users:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-server.get('/mysql/gettables', async (req, res) => {
-  try {
-    const connection = await mysql_db;
-
-    if (!connection) {
-      return res.status(500).json({ error: 'MySQL connection error' });
-    }
-
-    const [results] = await connection.query('SHOW TABLES;');
-    const users = results;
-
-    res.status(200).json(users);
-  } catch (error) {
-    console.error('Error retrieving users:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
 
 let router_v1;
 let router_v2;

@@ -1,28 +1,29 @@
 import { Request, Response } from 'express';
 import { getDBMySQL } from '../db/db';
-
+const bcrypt = require('bcryptjs');
 
 interface RequestWithSession extends Request {
   session: any;
 }
 
-const bcrypt = require('bcryptjs');
+const userExists = async (userName: string) => {
+  const db = await getDBMySQL();
+  const [existingUser] = JSON.parse(JSON.stringify(await db.query('SELECT * FROM users WHERE login = ?', [userName])));
+  return existingUser.length > 0;
+}
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const db = await getDBMySQL();
     const userName = req.body.login;
-    const [existingUser] = JSON.parse(JSON.stringify(await db.query('SELECT * FROM users WHERE login = ?', [userName])));
-    console.log(existingUser)
-    if (existingUser.length > 0) {
+    if (await userExists(userName)) {
       return res.status(400).json("Username already exists.");
     }
     const hashedPassword = await bcrypt.hash(req.body.pass, 10);
+    const db = await getDBMySQL();
     await db.query(
       'INSERT INTO users (login, pass) VALUES (?, ?)',
       [userName, hashedPassword]
     );
-
     res.status(200).json({ ok: true });
   } catch (error) {
     console.error('Registration error:', error);
@@ -33,20 +34,16 @@ export const register = async (req: Request, res: Response) => {
 export const login = async (req: RequestWithSession, res: Response) => {
 
   try {
-    const db = await getDBMySQL();
     const userName = req.body.login;
+    if (!(await userExists(userName))) {
+      return res.status(401).send({ error: "User not found" });
+    }
+    const db = await getDBMySQL();
     const [checkUser] = JSON.parse(JSON.stringify(await db.query('SELECT * FROM users WHERE login = ?', [userName])));
-    //console.log(checkUser[0].pass)
-    //console.log(checkUser.length)
-    //console.log(await bcrypt.compare(req.body.pass, checkUser[0].pass))
-
-    let checkPass = await bcrypt.compare(req.body.pass, checkUser[0].pass);
-    //console.log(checkUser.length)
-    //console.log(checkPass)
-    if (checkUser.length > 0 && checkPass) {
-      console.log("Bubbbaaa")
+    const checkPass = await bcrypt.compare(req.body.pass, checkUser[0].pass);
+    if (checkPass) {
       req.session.login = userName;
-      return res.status(200).send({ "ok": true });
+      return res.status(200).send({ ok: true });
     } else {
       return res.status(401).send({ error: "not found" })
     }

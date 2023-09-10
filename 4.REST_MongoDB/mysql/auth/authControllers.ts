@@ -36,13 +36,13 @@ export const login = async (req: RequestWithSession, res: Response) => {
     const db = await getDBMySQL();
     const userName = req.body.login;
     const [checkUser] = JSON.parse(JSON.stringify(await db.query('SELECT * FROM users WHERE login = ?', [userName])));
-    console.log(checkUser[0].pass)
-    console.log(checkUser.length)
-    console.log(await bcrypt.compare(req.body.pass, checkUser[0].pass))
+    //console.log(checkUser[0].pass)
+    //console.log(checkUser.length)
+    //console.log(await bcrypt.compare(req.body.pass, checkUser[0].pass))
 
     let checkPass = await bcrypt.compare(req.body.pass, checkUser[0].pass);
-    console.log(checkUser.length)
-    console.log(checkPass)
+    //console.log(checkUser.length)
+    //console.log(checkPass)
     if (checkUser.length > 0 && checkPass) {
       console.log("Bubbbaaa")
       req.session.login = userName;
@@ -72,5 +72,7 @@ export const logout = async (req: RequestWithSession, res: Response) => {
 }
 
 export const getSession = async (req: RequestWithSession, res: Response) => {
-  console.log(JSON.stringify(req.session))
+  let session = JSON.stringify(req.session.login)
+  console.log(session)
+  res.send({ session: session })
 } 

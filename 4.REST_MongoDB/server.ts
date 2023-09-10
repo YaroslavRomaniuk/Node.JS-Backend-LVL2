@@ -79,10 +79,10 @@ if (mongoDB) {
 
   const sessionStore = new MySQLStore({
     /* MySQL connection details */
-    host: 'your_db_host',
-    user: 'your_db_user',
-    password: 'your_db_password',
-    database: 'your_db_name',
+    host: 'myfirstawsdb.coo1p4sufx7v.eu-north-1.rds.amazonaws.com',
+    user: 'YAR',
+    password: '12345678yar!!!',
+    database: 'todo_db',
     clearExpired: true, // Automatically remove expired sessions
     checkExpirationInterval: 900000, // How frequently to check for and remove expired sessions (15 minutes)
   });
@@ -128,6 +128,25 @@ server.get('/mysql/getusers', async (req, res) => {
     }
 
     const [results] = await connection.query('SELECT * FROM users');
+    const users = results;
+
+    res.status(200).json(users);
+  } catch (error) {
+    console.error('Error retrieving users:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+server.get('/mysql/getitems', async (req, res) => {
+  try {
+    const connection = await mysql_db;
+
+    if (!connection) {
+      return res.status(500).json({ error: 'MySQL connection error' });
+    }
+
+    const [results] = await connection.query('SELECT * FROM items');
     const users = results;
 
     res.status(200).json(users);

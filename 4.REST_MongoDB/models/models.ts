@@ -9,3 +9,7 @@ export class User {
     constructor(public _id: ObjectId, public text:string, public checked:boolean) {}
   }
 
+  export class ItemMySQL {
+    constructor(public user_id: string, public text:string, public checked:boolean) {}
+  }
+

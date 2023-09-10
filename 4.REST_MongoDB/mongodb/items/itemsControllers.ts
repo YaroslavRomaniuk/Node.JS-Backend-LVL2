@@ -20,6 +20,7 @@ export const getItems = async (req: RequestWithSession, res: Response) => {
         const db = getDB();
         const users = db.collection('users');
         const user = await users.findOne({ login });
+        
 
         if (user) {
             res.status(200).json({ items: user.items });
@@ -68,6 +69,7 @@ export const changeItem = async (req: RequestWithSession, res: Response) => {
       const login = req.session.login;
       const users = db.collection('users');
   
+      console.log(req.body.checked)
       const result = await users.updateOne(
         { login, "items._id": new ObjectId(itemId) },
         {
@@ -93,6 +95,10 @@ export const changeItem = async (req: RequestWithSession, res: Response) => {
     try {
       const db = getDB();
       const itemId = req.body.id;
+      console.log("ITEMID: " + itemId)
+      console.log("BODY: " + JSON.stringify(req.body))
+
+
       const login = req.session.login;
       const users = db.collection('users');
   

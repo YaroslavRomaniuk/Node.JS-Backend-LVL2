@@ -2,20 +2,19 @@
 import express from 'express';
 import session from 'express-session';
 import cors from 'cors';
-
-
-const { connectToDb, getDB } = require('./mongodb/db/db');
-const { getDBMySQL } = require('./mysql/db/db');
-import { connectMySQLdb } from './mysql/db/db';
+import { connectToDb, getDB } from './mongodb/db/db';
+import { connectMySQLdb, getDBMySQL } from './mysql/db/db';
 import { Db } from 'mongodb';
-import { Connection } from 'mysql2/promise';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 const MongoDBStore = require('connect-mongodb-session')(session);
 const MySQLStore = require('express-mysql-session')(session);
 
-let mongoDB = false;
+let mongoDB = process.env.DB_TYPE; 
 
-let db: Db;
-let mysql_db: Promise<Connection | undefined>;
+
 
 const port = 3005;
 const server = express();
@@ -29,19 +28,26 @@ server.use(cors({
 }));
 */
 
-if (mongoDB) {
+const isMongoDB = process.env.DB_TYPE === 'mongodb';
+
+if (isMongoDB) {
 
   const store = new MongoDBStore({
-    uri: 'mongodb+srv://romaniuk007:LTwOGMGF0vGgYblY@myfirstcluster.qqcvgpb.mongodb.net/todos_app',
-    collection: 'sessions'
+    uri: process.env.MONGODB_URI,
+    collection: process.env.MONGODB_COLLECTION
   });
+  
 
+  if(!process.env.SESSION_SECRET) {
+    throw new Error('SESSION_SECRET is not defined');
+  } 
+  
   server.use(session({
-    secret: 'your_secret',
-    cookie: { maxAge: 1000 * 60 * 60 * 24 }, // 1 day
-    store: store,
-    resave: false,
-    saveUninitialized: false
+      secret: process.env.SESSION_SECRET,
+      cookie: { maxAge: 1000 * 60 * 60 * 24 },
+      store: store,
+      resave: false,
+      saveUninitialized: false
   }));
 
   connectToDb((err?: Error) => {
@@ -52,7 +58,7 @@ if (mongoDB) {
         console.log("ERROR:", err);
       });
 
-      db = getDB();
+      getDB();
     } else {
       console.log(`DB connection error: ${err}`);
     }
@@ -68,7 +74,7 @@ if (mongoDB) {
         console.log("ERROR:", err);
       });
 
-      mysql_db = getDBMySQL();
+      getDBMySQL();
     } else {
       console.log(`DB connection error: ${err}`);
     }
@@ -76,22 +82,25 @@ if (mongoDB) {
 
 
   const sessionStore = new MySQLStore({
-    host: 'myfirstawsdb.coo1p4sufx7v.eu-north-1.rds.amazonaws.com',
-    user: 'YAR',
-    password: '12345678yar!!!',
-    database: 'todo_db',
+    host: process.env.MYSQL_HOST,
+    user: process.env.MYSQL_USER,
+    password: process.env.MYSQL_PASSWORD,
+    database: process.env.MYSQL_DATABASE,
     clearExpired: true,
     checkExpirationInterval: 900000, 
   });
 
+  if(!process.env.SESSION_SECRET) {
+    throw new Error('SESSION_SECRET is not defined');
+  }
+  
   server.use(session({
-    secret: 'your_secret',
-    cookie: { maxAge: 1000 * 60 * 60 * 24 },
-    store: sessionStore,
-    resave: false,
-    saveUninitialized: false
+      secret: process.env.SESSION_SECRET,
+      cookie: { maxAge: 1000 * 60 * 60 * 24 },
+      store: sessionStore,
+      resave: false,
+      saveUninitialized: false
   }));
-
 }
 
 

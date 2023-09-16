@@ -21,12 +21,11 @@ const server = express();
 server.use(express.static('static'));
 server.use(express.json());
 
-/** 
+
 server.use(cors({
-  origin: 'http://127.0.0.1:5500',
+  origin: 'http://localhost:5500',
   credentials: true,
 }));
-*/
 
 const isMongoDB = process.env.DB_TYPE === 'mongodb';
 
@@ -74,11 +73,11 @@ if (isMongoDB) {
         console.log("ERROR:", err);
       });
 
-      getDBMySQL();
+      const db = getDBMySQL();
     } else {
       console.log(`DB connection error: ${err}`);
     }
-  });
+  }); 
 
 
   const sessionStore = new MySQLStore({
@@ -107,7 +106,7 @@ if (isMongoDB) {
 
 let router_v1;
 let router_v2;
-if (mongoDB) {
+if (isMongoDB) {
   router_v1 = require('./mongodb/routes/routes_v1')
   router_v2 = require('./mongodb/routes/routes_v2')
 } else {

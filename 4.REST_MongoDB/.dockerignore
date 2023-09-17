@@ -1,0 +1,14 @@
+# Log files
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Directory used by npm to cache downloaded dependencies
+node_modules
+
+# Dist folder
+dist
+
+# Ignore .git and .hg directories
+.git
+.hg

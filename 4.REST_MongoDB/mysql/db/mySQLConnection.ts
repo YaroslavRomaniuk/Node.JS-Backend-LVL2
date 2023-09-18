@@ -18,7 +18,7 @@ export default function mySQLConnection(server: Express) {
             console.log(`DB connection error: ${err}`);
         }
     });
-    
+
     const sessionStore = new MySQLStore({
         host: process.env.MYSQL_HOST,
         user: process.env.MYSQL_USER,

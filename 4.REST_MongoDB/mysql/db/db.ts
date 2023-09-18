@@ -1,13 +1,16 @@
 import mysql from 'mysql2/promise';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 let dbConnection: mysql.Connection;
 
 export const connectMySQLdb = (cb: (error?: Error) => void) => {
   mysql.createConnection({
-    host: 'myfirstawsdb.coo1p4sufx7v.eu-north-1.rds.amazonaws.com',
-    user: 'YAR',
-    password: '12345678yar!!!',
-    database: 'todo_db'
+    host: process.env.MYSQL_HOST,
+    user: process.env.MYSQL_USER,
+    password: process.env.MYSQL_PASSWORD,
+    database: process.env.MYSQL_DATABASE
   })
     .then((connection: mysql.Connection) => {
       console.log("!!! MySQL DB CONNECTED !!!")

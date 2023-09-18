@@ -36,7 +36,7 @@ export const login = async (req: RequestWithSession, res: Response) => {
   try {
     const userName = req.body.login;
     if (!(await userExists(userName))) {
-      return res.status(401).send({ error: "User not found" });
+      return res.status(401).send({ error: "not found" });
     }
     const db = await getDBMySQL();
     const [checkUser] = JSON.parse(JSON.stringify(await db.query('SELECT * FROM users WHERE login = ?', [userName])));

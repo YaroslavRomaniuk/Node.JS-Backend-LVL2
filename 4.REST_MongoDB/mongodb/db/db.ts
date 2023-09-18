@@ -1,6 +1,13 @@
 import { MongoClient, Db } from 'mongodb';
+import dotenv from 'dotenv';
 
-const uri: string = 'mongodb+srv://romaniuk007:LTwOGMGF0vGgYblY@myfirstcluster.qqcvgpb.mongodb.net/';
+dotenv.config();
+
+const uri: string | undefined  = process.env.MONGODB_URI;
+
+if (!uri) {
+  throw new Error('MongoDB URI is not defined in the environment variables');
+}
 
 let dbConnection: Db;
 

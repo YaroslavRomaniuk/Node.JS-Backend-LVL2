@@ -2,8 +2,6 @@
 import express from 'express';
 import session from 'express-session';
 import cors from 'cors';
-import { connectToDb, getDB } from './mongodb/db/db';
-import { connectMySQLdb, getDBMySQL } from './mysql/db/db';
 import mongoDBConnection from './mongodb/db/mongoDBConnection';
 import mySQLConnection from './mysql/db/mySQLConnection';
 import dotenv from 'dotenv';
@@ -42,6 +40,8 @@ if (dbType === 'mongodb') {
   mySQLConnection(server);
   router_v1 = require('./mysql/routes/routes_v1')
   router_v2 = require('./mysql/routes/routes_v2')
+} else {
+  console.log("Please, choose between mongodb and mysql db in .env file")
 }
 
 server.use('/api/v1/', router_v1)

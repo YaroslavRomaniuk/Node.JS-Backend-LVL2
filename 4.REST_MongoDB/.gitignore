@@ -1,2 +1,4 @@
 .env
 ignore/
+config/
+app.env

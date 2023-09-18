@@ -5,8 +5,10 @@ yarn-error.log
 
 # Directory used by npm to cache downloaded dependencies
 node_modules
-draft
+ignore
 .env
+app.config
+config
 
 # Dist folder
 dist

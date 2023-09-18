@@ -1,6 +1,5 @@
 
 import express from 'express';
-import session from 'express-session';
 import cors from 'cors';
 import mongoDBConnection from './mongodb/db/mongoDBConnection';
 import mySQLConnection from './mysql/db/mySQLConnection';
@@ -8,11 +7,6 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const MongoDBStore = require('connect-mongodb-session')(session);
-const MySQLStore = require('express-mysql-session')(session);
-
-
-const port = process.env.PORT;
 const server = express();
 server.use(express.static('static'));
 server.use(express.json());

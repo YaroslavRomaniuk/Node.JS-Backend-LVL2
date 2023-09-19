@@ -2,3 +2,5 @@
 ignore/
 config/
 app.env
+.gitignore
+.dockerignore

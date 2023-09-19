@@ -7,7 +7,7 @@ yarn-error.log
 node_modules
 ignore
 .env
-app.config
+app.env
 config
 
 # Dist folder

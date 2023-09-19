@@ -1,6 +1,6 @@
 Sh++ backend Node.JS Course 2.4 REST+MongoDB by YAR Version 0.1
 
-You have two options how to run program on your computer
+You have two options how to run program on your device
 
 1. Clone this repository to your pc and run next command in you command line:
 npx ts-node server.ts

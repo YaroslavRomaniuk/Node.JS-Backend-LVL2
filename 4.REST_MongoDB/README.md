@@ -11,6 +11,6 @@ nodemon server.ts
 run command docker run -p 3005:3005 -d  --env-file ./app.env yaroslavromaniuk/yar2-4rest:0.0.1.RELEASE
 
 REMARKS:
-For both variants open http://localhost:3005/
+1. For both variants open http://localhost:3005/
 
-For both variants write me in pm and I will send you .env file with all credentials
+2. For both variants write me in pm and I will send you .env file with all credentials
